@@ -22,31 +22,30 @@ struct hash_table {
   int total;
 };
 
-
 /*
  * Returns: a hash code of an input string "key"
  * 
  * input: the hash_table (to get the size) and a key
  */
-
 int hash_function1(struct hash_table* hash_table, char* key) {
   return ( (int) key[0] ) % hash_table->size;
 }
 
-
 /*
  * Returns: a hash code of an input string "key"
  * 
  * input: the hash_table (to get the size) and a key
  */
-
 int hash_function2(struct hash_table* hash_table, char* key) {
   /*
    * Currently this is the same as hash_function2, but your assignment is 
    * to modify it to create an improved hash function: 
    */
-
-  return ( (int) key[0] ) % hash_table->size;
+  unsigned long hash_val = 5381;
+  int c;
+  while ((c = *key++))
+    hash_val = ((hash_val << 5) + hash_val) + c;
+  return (int)(hash_val % hash_table->size);
 }
 
 struct hash_table* hash_table_create(int array_size) {
@@ -187,18 +186,28 @@ int hash_table_collisions(struct hash_table* hash_table) {
    * this would essentially be the total number of elements above 1 for each 
    * "bucket" or hash array index. If there is only one element associated 
    * with a bucket, it would not count as a collision. Two elements would count
-   * as one collision, three elements would count as 2 collisions and so on. 
+   * as one collision, three elements would count as 2 collisions and so on.
    */
   int num_col = 0;
   
-  // code goes here: 
-
+  // code goes here:
+  for (int i = 0; i < hash_table->size; i++) {
+    int cnt = 0;
+    struct node* cur = hash_table->array[i];
+    while (cur != NULL) {
+      cnt++;
+      cur = cur->next;
+    }
+    if (cnt > 1)
+      num_col += (cnt - 1);
+  }
+  
   return num_col;
 }
 
 void display(struct hash_table* hash_table) {
   
-  printf("Hash table, size=%d, total=%d\n",hash_table->size, hash_table->total);
+  printf("Hash table, size=%d, total=%d\n",hash_table->size,hash_table->total);
   int i = 0;
   for (i = 0; i < hash_table->size; i++) {
     struct node *temp = hash_table->array[i];
