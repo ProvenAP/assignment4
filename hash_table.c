@@ -41,10 +41,10 @@ int hash_function2(struct hash_table* hash_table, char* key) {
    * Currently this is the same as hash_function2, but your assignment is 
    * to modify it to create an improved hash function: 
    */
-  unsigned long hash_val = 5381;
+  unsigned long hash_val = 0;
   int c;
   while ((c = *key++))
-    hash_val = ((hash_val << 5) + hash_val) + c;
+    hash_val = c + (hash_val << 6) + (hash_val << 16) - hash_val;
   return (int)(hash_val % hash_table->size);
 }
 
@@ -216,8 +216,8 @@ void display(struct hash_table* hash_table) {
     } else {
       printf("array[%d]", i);
       while (temp != NULL) {
-	printf("->(key=%s,value=%d)", temp->key, temp->value);
-	temp = temp->next;
+        printf("->(key=%s,value=%d)", temp->key, temp->value);
+        temp = temp->next;
       }
       printf("-|\n");
     }
